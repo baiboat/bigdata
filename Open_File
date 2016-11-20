@@ -1,0 +1,68 @@
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+import xml.etree.cElementTree as ET,re
+class Open_Fileman(object):
+
+    def get_allstore(self,file_name):
+        count = 0
+        count2 = 0
+        count3=0
+        count4=0
+        data = []
+        combin_data=[]
+        mix_combin_data=[]
+        # print file_name
+        # print type(file_name)
+        tree = ET.ElementTree(file=file_name)
+        # f = open('F:\Users\zwc\Desktop\z5', 'w')
+        for elem in tree.iter(tag='{urn:schemas-microsoft-com:office:spreadsheet}Data'):
+
+            ##########################################################################################3
+            # elem.text = str(unicode(elem.text).encode('utf-8'))
+            # f.write('%s' % (elem.text))
+            # f.write('%s' % '######')
+            # print elem.text
+            is_storeid=re.findall('\d{28}', elem.text)
+            count = count + 1
+            if count==2:
+                tim = elem.text
+            if is_storeid==[] and count3<1:
+                continue
+
+            else:
+
+                if count2 < 12:
+                    data.append(elem.text)
+                    #data.append(tim)
+                    count2 += 1
+                    count3+=1
+                    continue
+                elif is_storeid==[]:
+                    continue
+
+                data.append(tim)
+                data.append(elem.text)
+                count2 = 0
+
+
+        #print data
+        for each in data:
+            # if combin_data!=[]:
+            #     mix_combin_data.append(combin_data)
+
+            if count4<13:
+                combin_data.append(each)
+                count4+=1
+                continue
+            else:
+                # combin_data.append(each)
+                if len(combin_data) == 14:
+                    del combin_data[12]
+                mix_combin_data.append(combin_data)
+                combin_data=[]
+                combin_data.append(each)
+                count4 = 0
+        return mix_combin_data
+
+
+     
