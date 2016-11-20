@@ -1,0 +1,176 @@
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+import Comper
+import Fliter
+import Open_File
+import Path_Manager
+import Plot
+
+class captainer(object):
+    def __init__(self):
+
+       self.all_path=Path_Manager.filepath()
+       self.open_file=Open_File.Open_Fileman()
+       # self.opend_store=OpenStore.openstore()
+       self.flit=Fliter.FliterMan()
+       self.oplots=Plot.Plots()
+       self.comper=Comper.Compers()
+    def switch(self,store_id,swipattn,pattn,date=0):
+        if swipattn=='折线图':
+
+
+            #def draw(self,store_id,pattn):
+                # all_filename = self.all_path.get_all_path()
+                # all_file_contained_store=[]
+                # #unique_id_store=[]
+                # for each in all_filename:
+                #     each_file_containd_store = self.open_file.get_allstore(each)
+                #     for each_store in each_file_containd_store:
+                #         all_file_contained_store.append(each_store)
+                #     unique_id_store=self.flit.get_same_id_store(store_id,all_file_contained_store)
+            all_filename = self.all_path.get_all_path()
+            all_file_contained_store = []
+            # unique_id_store = []
+            for each in all_filename:
+                each_file_containd_store = self.open_file.get_allstore(each)
+                if each_file_containd_store == []:
+                    pass
+                # print each_file_containd_store
+                # for each_store in each_file_containd_store:
+                else:
+                    all_file_contained_store.append(each_file_containd_store)
+            # print all_file_contained_store
+            # print len(all_file_contained_store)
+            # f = open('F:\Users\zwc\Desktop\z4', 'w')
+            # for each in all_file_contained_store:
+            #     f.write('%s' % (each))
+            #     f.write('%s' % '#####################################################################################')
+            # f.close()
+            # for i in range(len(all_file_contained_store)):
+            #      if all_file_contained_store[i] == []:
+            #            print i
+            unique_id_store = self.flit.get_same_id_store(store_id, all_file_contained_store)
+            if pattn == '交易金额':
+
+                self.oplots.get_trans_value(unique_id_store)
+            elif pattn == '交易笔数':
+                self.oplots.get_trans_num(unique_id_store)
+            elif pattn == '交易人数':
+                self.oplots.get_trans_p_num(unique_id_store)
+            elif pattn == '实收笔单价':
+                self.oplots.get_offi_value(unique_id_store)
+            else:
+                print '请检查输入格式按要求输入'
+        elif swipattn=='同环比':
+            #def comp(self,store_id,pattn,date)
+                all_filename = self.all_path.get_all_path()
+                all_file_contained_store = []
+                #unique_id_store = []
+                for each in all_filename:
+                    each_file_containd_store = self.open_file.get_allstore(each)
+                    if each_file_containd_store==[]:
+                         pass
+                    # print each_file_containd_store
+                    # for each_store in each_file_containd_store:
+                    else:
+                        all_file_contained_store.append(each_file_containd_store)
+                # print all_file_contained_store
+                # print len(all_file_contained_store)
+                # f = open('F:\Users\zwc\Desktop\z4', 'w')
+                # for each in all_file_contained_store:
+                #     f.write('%s' % (each))
+                #     f.write('%s' % '#####################################################################################')
+                # f.close()
+                # for i in range(len(all_file_contained_store)):
+                #      if all_file_contained_store[i] == []:
+                #            print i
+                unique_id_store = self.flit.get_same_id_store(store_id,all_file_contained_store)
+                if pattn=='日':
+                    self.comper.day_comper(unique_id_store,date)
+                elif pattn=='周':
+                    self.comper.weekend_comper(unique_id_store,date)
+                elif pattn=='月':
+                    self.comper.mouth_comper(unique_id_store,date)
+                else:
+                    print '请检查输入格式按要求输入'
+        else:
+            print '请检查输入格式按要求输入'
+
+if __name__ == "__main__":
+    store_id=raw_input(u'请输入门店号:')
+    if len(store_id)!=28:
+        print '请输入正确的门店号'
+    store_id=int(store_id)
+    swipattn=raw_input(u'请选择查询模式(折线图或同环比):')
+    if swipattn=='同环比':
+        pattn=raw_input(u'请输入查询类型(日，周，月）:')
+        date = raw_input(u'请按格式输入日期(20160426—20160920:')
+        date=int(date)
+        sw = captainer()
+        sw.switch(store_id, swipattn, pattn, date)
+    elif swipattn=='折线图':
+        pattn=raw_input(u'请输入查询类型(交易金额,交易人数,交易笔数,实收笔单价):')
+        sw=captainer()
+        sw.switch(store_id,swipattn,pattn)#需要定义成可选参数
+    # store_id = 2015120200077000000010080780
+    # swipattn = 'draw'
+    # if swipattn == 'comp':
+    #     pattn = 'day'
+    #     date = 20160910
+    # elif swipattn == 'draw':
+    #     pattn = raw_input(u'请输入查询类型:')
+    # sw = captainer()
+    # sw.switch(store_id, swipattn, pattn, date=0)  # 需要定义成可选参数
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
