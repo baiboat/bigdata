@@ -1,0 +1,534 @@
+import  re
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+mpl.rcParams['font.family'] = 'sans-serif'
+mpl.rcParams['font.sans-serif'] = [u'SimHei']
+mpl.rcParams['axes.unicode_minus'] = False
+
+
+class Plots(object):
+    def get_trans_value(self, unique_id_store):
+        j = 0
+        week_id_store = []
+        day_id_store = unique_id_store
+        mouth_id_store = []
+        four_mouth = []
+        fif_mouth = []
+        six_mouth = []
+        seven_mouth = []
+        eight_mouth = []
+        nine_mouth = []
+        plot_para_y = []
+        plot_para_x = []
+        plot_wpara_y = []
+        plot_wpara_x = []
+        plot_mpara_y = []
+        plot_mpara_x = []
+        week_date = []
+        mouth_date = []
+        for i in range(len(day_id_store) / 7):
+            week_id_store.append(day_id_store[j:j + 7])
+            j += 7
+        if j < len(day_id_store):
+            k = len(day_id_store)
+            week_id_store.append(day_id_store[j:k])
+        for i in range(len(day_id_store)):
+            if re.findall('.*201604\d{1,2}', day_id_store[i][12]) != []:
+                four_mouth.append(day_id_store[i])
+            elif re.findall('.*201605\d{1,2}', day_id_store[i][12]) != []:
+                fif_mouth.append(day_id_store[i])
+            elif re.findall('.*201606\d{1,2}', day_id_store[i][12]) != []:
+                six_mouth.append(day_id_store[i])
+            elif re.findall('.*201607\d{1,2}', day_id_store[i][12]) != []:
+                seven_mouth.append(day_id_store[i])
+            elif re.findall('.*201608\d{1,2}', day_id_store[i][12]) != []:
+                eight_mouth.append(day_id_store[i])
+            elif re.findall('.*201609\d{1,2}', day_id_store[i][12]) != []:
+                nine_mouth.append(day_id_store[i])
+        mouth_id_store.append(four_mouth)
+        mouth_id_store.append(fif_mouth)
+        mouth_id_store.append(six_mouth)
+        mouth_id_store.append(seven_mouth)
+        mouth_id_store.append(eight_mouth)
+        mouth_id_store.append(nine_mouth)
+
+        for i in range(len(day_id_store)):
+            if re.search('\d', day_id_store[i][5]) == None:
+                pass
+            else:
+              plot_para_y.append(float(day_id_store[i][5]))
+              # plot_para_x.append(int(re.findall('\d{8}', day_id_store[i][12])[0]))
+        for i in range(len(day_id_store)):
+            plot_para_x.append(i + 1)
+        if len(plot_para_x)==len(plot_para_y):
+            pass
+        else:
+            h = len(plot_para_y)
+            plot_para_x = plot_para_x[0:h]
+        x0 = plot_para_x  # 存放日期信息
+        y0 = plot_para_y
+        for i in range(len(week_id_store)):
+            for j in range(len(week_id_store[i])):
+                # print week_id_store[i][j]
+                if re.search('\d', week_id_store[i][j][5]) == None:
+                    pass
+                else:
+                    week_date.append(float(week_id_store[i][j][5]))
+                    c = sum(week_date)
+            plot_wpara_y.append(c)
+            # print plot_wpara_y
+            week_date = []
+        for i in range(len(week_id_store)):
+            plot_wpara_x.append(i + 1)
+        for i in range(len(mouth_id_store)):
+            for j in range(len(mouth_id_store[i])):
+                if re.search('\d', mouth_id_store[i][j][5]) == None:
+                    pass
+                else:
+                    mouth_date.append(float(mouth_id_store[i][j][5]))
+                    d = sum(mouth_date)
+            plot_mpara_y.append(d)
+            # print plot_mpara_y
+            mouth_date = []
+        for i in range(len(mouth_id_store)):
+            plot_mpara_x.append(i + 1)
+            ######################可改为正则
+        # four_mouth=sum(x0[0:5])
+        # plot_mpara_y.append(four_mouth)
+        # fif_mouth=sum(x0[6:37])
+        # plot_mpara_y.append(fif_mouth)
+        # six_mouth=sum(x0[38:68])
+        # plot_mpara_y.append(six_mouth)
+        # seven_mouth=sum(x0[69:100])
+        # plot_mpara_y.append(seven_mouth)
+        # eight_moutn=sum(x0[101:132])
+        # plot_mpara_y.append(eight_moutn)
+        # nine_mouth=sum(x0[133:153])
+        # plot_mpara_y.append(nine_mouth)
+        if len(plot_mpara_x) == len(plot_mpara_y):
+            pass
+        else:
+           k=len(plot_mpara_x)
+           plot_mpara_y=plot_mpara_y[0:k]
+        if len(plot_wpara_x) == len(plot_wpara_y):
+            pass
+        else:
+            j=len(plot_wpara_y)
+            plot_wpara_x=plot_wpara_x[0:j]
+        x1 = plot_mpara_x
+        y1 = plot_mpara_y
+        x2 = plot_wpara_x
+        y2 = plot_wpara_y
+        # print x1,y1
+        # print x0,x1,x2
+        # print y0,y1,y2
+        # plt.rcParams['font.sas-serig'] = ['SimHei']
+        # plt.rcParams['axes.unicode_minus'] = False
+        plt.figure(figsize=(8, 4))
+        plt.plot(x0, y0,color="red")  # 在当前绘图对象绘图（X轴，Y轴，蓝色虚线，线宽度）
+        # plt.annotate('local max', xy=(2, 1), xytext=(3, 1.5),
+        #              arrowprops=dict(facecolor='black', shrink=0.05),
+        #              )
+        plt.plot(x1, y1, "g")
+        plt.plot(x2, y2, "b")
+        plt.xlabel(u'时间')  # X轴标签
+        plt.ylabel(u"(交易金额\元)")  # Y轴标签
+        plt.text(71,280237, u'红线代表日\n蓝线代表周\n绿线代表月')
+        plt.title(u"交易金额")  # 图标题
+        plt.legend()
+        # plt.legend(loc=0)
+        plt.show()  # 显示图
+        # plt.savefig("line.jpg")  # 保存图
+
+    def get_trans_num(self, unique_id_store):
+        j = 0
+        week_id_store = []
+        day_id_store = unique_id_store
+        mouth_id_store = []
+        four_mouth = []
+        fif_mouth = []
+        six_mouth = []
+        seven_mouth = []
+        eight_mouth = []
+        nine_mouth = []
+        plot_para_y = []
+        plot_para_x = []
+        plot_wpara_y = []
+        plot_wpara_x = []
+        plot_mpara_y = []
+        plot_mpara_x = []
+        week_date = []
+        mouth_date = []
+        for i in range(len(day_id_store) / 7):
+            week_id_store.append(day_id_store[j:j + 7])
+            j += 7
+        if j < len(day_id_store):
+            k = len(day_id_store)
+            week_id_store.append(day_id_store[j:k])
+        for i in range(len(day_id_store)):
+            if re.findall('.*201604\d{1,2}', day_id_store[i][12]) != []:
+                four_mouth.append(day_id_store[i])
+            elif re.findall('.*201605\d{1,2}', day_id_store[i][12]) != []:
+                fif_mouth.append(day_id_store[i])
+            elif re.findall('.*201606\d{1,2}', day_id_store[i][12]) != []:
+                six_mouth.append(day_id_store[i])
+            elif re.findall('.*201607\d{1,2}', day_id_store[i][12]) != []:
+                seven_mouth.append(day_id_store[i])
+            elif re.findall('.*201608\d{1,2}', day_id_store[i][12]) != []:
+                eight_mouth.append(day_id_store[i])
+            elif re.findall('.*201609\d{1,2}', day_id_store[i][12]) != []:
+                nine_mouth.append(day_id_store[i])
+        mouth_id_store.append(four_mouth)
+        mouth_id_store.append(fif_mouth)
+        mouth_id_store.append(six_mouth)
+        mouth_id_store.append(seven_mouth)
+        mouth_id_store.append(eight_mouth)
+        mouth_id_store.append(nine_mouth)
+
+        for i in range(len(day_id_store)):
+            if re.search('\d', day_id_store[i][6]) == None:
+                pass
+            else:
+                plot_para_y.append(float(day_id_store[i][6]))
+                # plot_para_x.append(int(re.findall('\d{8}', day_id_store[i][12])[0]))
+        for i in range(len(day_id_store)):
+            plot_para_x.append(i + 1)
+        if len(plot_para_x) == len(plot_para_y):
+            pass
+        else:
+            h = len(plot_para_y)
+            plot_para_x = plot_para_x[0:h]
+        x0 = plot_para_x  # 存放日期信息
+        y0 = plot_para_y
+        for i in range(len(week_id_store)):
+            for j in range(len(week_id_store[i])):
+                # print week_id_store[i][j]
+                if re.search('\d', week_id_store[i][j][6]) == None:
+                    pass
+                else:
+                    week_date.append(float(week_id_store[i][j][6]))
+                    c = sum(week_date)
+            plot_wpara_y.append(c)
+            # print plot_wpara_y
+            week_date = []
+        for i in range(len(week_id_store)):
+            plot_wpara_x.append(i + 1)
+        for i in range(len(mouth_id_store)):
+            for j in range(len(mouth_id_store[i])):
+                if re.search('\d', mouth_id_store[i][j][6]) == None:
+                    pass
+                else:
+                    mouth_date.append(float(mouth_id_store[i][j][6]))
+                    d = sum(mouth_date)
+            plot_mpara_y.append(d)
+            # print plot_mpara_y
+            mouth_date = []
+        for i in range(len(mouth_id_store)):
+            plot_mpara_x.append(i + 1)
+            ######################可改为正则
+        # four_mouth=sum(x0[0:5])
+        # plot_mpara_y.append(four_mouth)
+        # fif_mouth=sum(x0[6:37])
+        # plot_mpara_y.append(fif_mouth)
+        # six_mouth=sum(x0[38:68])
+        # plot_mpara_y.append(six_mouth)
+        # seven_mouth=sum(x0[69:100])
+        # plot_mpara_y.append(seven_mouth)
+        # eight_moutn=sum(x0[101:132])
+        # plot_mpara_y.append(eight_moutn)
+        # nine_mouth=sum(x0[133:153])
+        # plot_mpara_y.append(nine_mouth)
+        if len(plot_mpara_x) == len(plot_mpara_y):
+            pass
+        else:
+            k = len(plot_mpara_x)
+            plot_mpara_y = plot_mpara_y[0:k]
+        if len(plot_wpara_x) == len(plot_wpara_y):
+            pass
+        else:
+            j = len(plot_wpara_y)
+            plot_wpara_x = plot_wpara_x[0:j]
+        x1 = plot_mpara_x
+        y1 = plot_mpara_y
+        x2 = plot_wpara_x
+        y2 = plot_wpara_y
+        # print x1,y1
+        # print x0,x1,x2
+        plt.figure(figsize=(8, 4))
+        plt.plot(x0, y0, color="red")  # 在当前绘图对象绘图（X轴，Y轴，蓝色虚线，线宽度）
+        # plt.annotate('local max', xy=(2, 1), xytext=(3, 1.5),
+        #              arrowprops=dict(facecolor='black', shrink=0.05),
+        #              )
+        plt.plot(x1, y1, "g")
+        plt.plot(x2, y2, "b")
+        plt.xlabel(u'时间')  # X轴标签
+        plt.ylabel(u"(交易笔数\元)")  # Y轴标签
+        plt.text(71, 280237, u'红线代表日\n蓝线代表周\n绿线代表月')
+        plt.title(u"交易笔数")  # 图标题
+        plt.legend()
+        # plt.legend(loc=0)
+        plt.show()  # 显示图
+
+    def get_offi_value(self, unique_id_store):
+        j = 0
+        week_id_store = []
+        day_id_store = unique_id_store
+        mouth_id_store = []
+        four_mouth = []
+        fif_mouth = []
+        six_mouth = []
+        seven_mouth = []
+        eight_mouth = []
+        nine_mouth = []
+        plot_para_y = []
+        plot_para_x = []
+        plot_wpara_y = []
+        plot_wpara_x = []
+        plot_mpara_y = []
+        plot_mpara_x = []
+        week_date = []
+        mouth_date = []
+        for i in range(len(day_id_store) / 7):
+            week_id_store.append(day_id_store[j:j + 7])
+            j += 7
+        if j < len(day_id_store):
+            k = len(day_id_store)
+            week_id_store.append(day_id_store[j:k])
+        for i in range(len(day_id_store)):
+            if re.findall('.*201604\d{1,2}', day_id_store[i][12]) != []:
+                four_mouth.append(day_id_store[i])
+            elif re.findall('.*201605\d{1,2}', day_id_store[i][12]) != []:
+                fif_mouth.append(day_id_store[i])
+            elif re.findall('.*201606\d{1,2}', day_id_store[i][12]) != []:
+                six_mouth.append(day_id_store[i])
+            elif re.findall('.*201607\d{1,2}', day_id_store[i][12]) != []:
+                seven_mouth.append(day_id_store[i])
+            elif re.findall('.*201608\d{1,2}', day_id_store[i][12]) != []:
+                eight_mouth.append(day_id_store[i])
+            elif re.findall('.*201609\d{1,2}', day_id_store[i][12]) != []:
+                nine_mouth.append(day_id_store[i])
+        mouth_id_store.append(four_mouth)
+        mouth_id_store.append(fif_mouth)
+        mouth_id_store.append(six_mouth)
+        mouth_id_store.append(seven_mouth)
+        mouth_id_store.append(eight_mouth)
+        mouth_id_store.append(nine_mouth)
+
+        for i in range(len(day_id_store)):
+            if re.search('\d', day_id_store[i][8]) == None:
+                pass
+            else:
+                plot_para_y.append(float(day_id_store[i][8]))
+                # plot_para_x.append(int(re.findall('\d{8}', day_id_store[i][12])[0]))
+        for i in range(len(day_id_store)):
+            plot_para_x.append(i + 1)
+        if len(plot_para_x) == len(plot_para_y):
+            pass
+        else:
+            h = len(plot_para_y)
+            plot_para_x = plot_para_x[0:h]
+        x0 = plot_para_x  # 存放日期信息
+        y0 = plot_para_y
+        for i in range(len(week_id_store)):
+            for j in range(len(week_id_store[i])):
+                # print week_id_store[i][j]
+                if re.search('\d', week_id_store[i][j][8]) == None:
+                    pass
+                else:
+                    week_date.append(float(week_id_store[i][j][8]))
+                    c = sum(week_date)
+            plot_wpara_y.append(c)
+            # print plot_wpara_y
+            week_date = []
+        for i in range(len(week_id_store)):
+            plot_wpara_x.append(i + 1)
+        for i in range(len(mouth_id_store)):
+            for j in range(len(mouth_id_store[i])):
+                if re.search('\d', mouth_id_store[i][j][8]) == None:
+                    pass
+                else:
+                    mouth_date.append(float(mouth_id_store[i][j][8]))
+                    d = sum(mouth_date)
+            plot_mpara_y.append(d)
+            # print plot_mpara_y
+            mouth_date = []
+        for i in range(len(mouth_id_store)):
+            plot_mpara_x.append(i + 1)
+            ######################可改为正则
+        # four_mouth=sum(x0[0:5])
+        # plot_mpara_y.append(four_mouth)
+        # fif_mouth=sum(x0[6:37])
+        # plot_mpara_y.append(fif_mouth)
+        # six_mouth=sum(x0[38:68])
+        # plot_mpara_y.append(six_mouth)
+        # seven_mouth=sum(x0[69:100])
+        # plot_mpara_y.append(seven_mouth)
+        # eight_moutn=sum(x0[101:132])
+        # plot_mpara_y.append(eight_moutn)
+        # nine_mouth=sum(x0[133:153])
+        # plot_mpara_y.append(nine_mouth)
+        if len(plot_mpara_x) == len(plot_mpara_y):
+            pass
+        else:
+            k = len(plot_mpara_x)
+            plot_mpara_y = plot_mpara_y[0:k]
+        if len(plot_wpara_x) == len(plot_wpara_y):
+            pass
+        else:
+            j = len(plot_wpara_y)
+            plot_wpara_x = plot_wpara_x[0:j]
+        x1 = plot_mpara_x
+        y1 = plot_mpara_y
+        x2 = plot_wpara_x
+        y2 = plot_wpara_y
+        # print x1,y1
+        # print x0,x1,x2
+        plt.figure(figsize=(8, 4))
+        plt.plot(x0, y0, color="red")  # 在当前绘图对象绘图（X轴，Y轴，蓝色虚线，线宽度）
+        # plt.annotate('local max', xy=(2, 1), xytext=(3, 1.5),
+        #              arrowprops=dict(facecolor='black', shrink=0.05),
+        #              )
+        plt.plot(x1, y1, "g")
+        plt.plot(x2, y2, "b")
+        plt.xlabel(u'时间')  # X轴标签
+        plt.ylabel(u"(实收笔单价\元)")  # Y轴标签
+        plt.text(71, 280237, u'红线代表日\n蓝线代表周\n绿线代表月')
+        plt.title(u"实收笔单价")  # 图标题
+        plt.legend()
+        # plt.legend(loc=0)
+        plt.show()  # 显示图
+        # plt.legend()
+        # plt.legend(loc=0)
+
+        # plt.savefig("line.jpg")  # 保存图
+
+    def get_trans_p_num(self, unique_id_store):
+        j = 0
+        week_id_store = []
+        day_id_store = unique_id_store
+        mouth_id_store = []
+        four_mouth = []
+        fif_mouth = []
+        six_mouth = []
+        seven_mouth = []
+        eight_mouth = []
+        nine_mouth = []
+        plot_para_y = []
+        plot_para_x = []
+        plot_wpara_y = []
+        plot_wpara_x = []
+        plot_mpara_y = []
+        plot_mpara_x = []
+        week_date = []
+        mouth_date = []
+        for i in range(len(day_id_store) / 7):
+            week_id_store.append(day_id_store[j:j + 7])
+            j += 7
+        if j < len(day_id_store):
+            k = len(day_id_store)
+            week_id_store.append(day_id_store[j:k])
+        for i in range(len(day_id_store)):
+            if re.findall('.*201604\d{1,2}', day_id_store[i][12]) != []:
+                four_mouth.append(day_id_store[i])
+            elif re.findall('.*201605\d{1,2}', day_id_store[i][12]) != []:
+                fif_mouth.append(day_id_store[i])
+            elif re.findall('.*201606\d{1,2}', day_id_store[i][12]) != []:
+                six_mouth.append(day_id_store[i])
+            elif re.findall('.*201607\d{1,2}', day_id_store[i][12]) != []:
+                seven_mouth.append(day_id_store[i])
+            elif re.findall('.*201608\d{1,2}', day_id_store[i][12]) != []:
+                eight_mouth.append(day_id_store[i])
+            elif re.findall('.*201609\d{1,2}', day_id_store[i][12]) != []:
+                nine_mouth.append(day_id_store[i])
+        mouth_id_store.append(four_mouth)
+        mouth_id_store.append(fif_mouth)
+        mouth_id_store.append(six_mouth)
+        mouth_id_store.append(seven_mouth)
+        mouth_id_store.append(eight_mouth)
+        mouth_id_store.append(nine_mouth)
+
+        for i in range(len(day_id_store)):
+            if re.search('\d', day_id_store[i][7]) == None:
+                pass
+            else:
+                plot_para_y.append(float(day_id_store[i][7]))
+                # plot_para_x.append(int(re.findall('\d{8}', day_id_store[i][12])[0]))
+        for i in range(len(day_id_store)):
+            plot_para_x.append(i + 1)
+        if len(plot_para_x) == len(plot_para_y):
+            pass
+        else:
+            h = len(plot_para_y)
+            plot_para_x = plot_para_x[0:h]
+        x0 = plot_para_x  # 存放日期信息
+        y0 = plot_para_y
+        for i in range(len(week_id_store)):
+            for j in range(len(week_id_store[i])):
+                # print week_id_store[i][j]
+                if re.search('\d', week_id_store[i][j][7]) == None:
+                    pass
+                else:
+                    week_date.append(float(week_id_store[i][j][7]))
+                    c = sum(week_date)
+            plot_wpara_y.append(c)
+            # print plot_wpara_y
+            week_date = []
+        for i in range(len(week_id_store)):
+            plot_wpara_x.append(i + 1)
+        for i in range(len(mouth_id_store)):
+            for j in range(len(mouth_id_store[i])):
+                if re.search('\d', mouth_id_store[i][j][7]) == None:
+                    pass
+                else:
+                    mouth_date.append(float(mouth_id_store[i][j][7]))
+                    d = sum(mouth_date)
+            plot_mpara_y.append(d)
+            # print plot_mpara_y
+            mouth_date = []
+        for i in range(len(mouth_id_store)):
+            plot_mpara_x.append(i + 1)
+            ######################可改为正则
+        # four_mouth=sum(x0[0:5])
+        # plot_mpara_y.append(four_mouth)
+        # fif_mouth=sum(x0[6:37])
+        # plot_mpara_y.append(fif_mouth)
+        # six_mouth=sum(x0[38:68])
+        # plot_mpara_y.append(six_mouth)
+        # seven_mouth=sum(x0[69:100])
+        # plot_mpara_y.append(seven_mouth)
+        # eight_moutn=sum(x0[101:132])
+        # plot_mpara_y.append(eight_moutn)
+        # nine_mouth=sum(x0[133:153])
+        # plot_mpara_y.append(nine_mouth)
+        if len(plot_mpara_x) == len(plot_mpara_y):
+            pass
+        else:
+            k = len(plot_mpara_x)
+            plot_mpara_y = plot_mpara_y[0:k]
+        if len(plot_wpara_x) == len(plot_wpara_y):
+            pass
+        else:
+            j = len(plot_wpara_y)
+            plot_wpara_x = plot_wpara_x[0:j]
+        x1 = plot_mpara_x
+        y1 = plot_mpara_y
+        x2 = plot_wpara_x
+        y2 = plot_wpara_y
+        # print x1,y1
+        # print x0,x1,x2
+        plt.figure(figsize=(8, 4))
+        plt.plot(x0, y0, color="red")  # 在当前绘图对象绘图（X轴，Y轴，蓝色虚线，线宽度）
+        # plt.annotate('local max', xy=(2, 1), xytext=(3, 1.5),
+        #              arrowprops=dict(facecolor='black', shrink=0.05),
+        #              )
+        plt.plot(x1, y1, "g")
+        plt.plot(x2, y2, "b")
+        plt.xlabel(u'时间')  # X轴标签
+        plt.ylabel(u"(交易人数\元)")  # Y轴标签
+        plt.text(71, 280237, u'红线代表日\n蓝线代表周\n绿线代表月')
+        plt.title(u"交易人数")  # 图标题
+        plt.legend()
+        # plt.legend(loc=0)
+        plt.show()  # 显示图
