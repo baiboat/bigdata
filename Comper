@@ -1,0 +1,509 @@
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+import re
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
+mpl.rcParams['font.family'] = 'sans-serif'
+mpl.rcParams['font.sans-serif'] = [u'SimHei']
+mpl.rcParams['axes.unicode_minus'] = False
+
+class Compers(object):
+    def day_comper(self, unique_id_store, date):
+
+        week_id_store = []
+        day_id_store = unique_id_store
+        mouth_id_store = []
+        four_mouth = []
+        fif_mouth = []
+        six_mouth = []
+        seven_mouth = []
+        eight_mouth = []
+        nine_mouth = []
+        visit_date_data=[]
+        circle_base_data=[]
+        circle_grow=[]
+        same_base_data=[]
+        # print day_id_store
+        for j in range(len(day_id_store) / 7):
+            week_id_store.append(day_id_store[j:j + 7])
+            j += 7
+        if j < len(day_id_store):
+            k = len(day_id_store)
+            week_id_store.append(day_id_store[j:k])
+        for i in range(25):
+            four_mouth.append([])
+        for i in range(len(day_id_store)):
+            if re.findall('.*201604\d{1,2}', day_id_store[i][12]) != []:
+                four_mouth.append(day_id_store[i])
+            elif re.findall('.*201605\d{1,2}', day_id_store[i][12]) != []:
+                fif_mouth.append(day_id_store[i])
+            elif re.findall('.*201606\d{1,2}', day_id_store[i][12]) != []:
+                six_mouth.append(day_id_store[i])
+            elif re.findall('.*201607\d{1,2}', day_id_store[i][12]) != []:
+                seven_mouth.append(day_id_store[i])
+            elif re.findall('.*201608\d{1,2}', day_id_store[i][12]) != []:
+                eight_mouth.append(day_id_store[i])
+            elif re.findall('.*201609\d{1,2}', day_id_store[i][12]) != []:
+                nine_mouth.append(day_id_store[i])
+        for j in range(10):
+            nine_mouth.append([])
+        mouth_id_store.append(four_mouth)
+        mouth_id_store.append(fif_mouth)
+        mouth_id_store.append(six_mouth)
+        mouth_id_store.append(seven_mouth)
+        mouth_id_store.append(eight_mouth)
+        mouth_id_store.append(nine_mouth)
+        # print len(fif_mouth)
+        # print len(mouth_id_store)
+        # print mouth_id_store[1]
+        # print mouth_id_store[1][0]
+        # print mouth_id_store[1][0][0]
+        #求日同比
+        if date>20160920 or date<20160426:
+            print '查询日期超出数据范围'
+            exit(0)
+        date_mouth=int(str(date)[5])-4#找出要查找的月份
+        # print mouth_id_store[0]
+        # print mouth_id_store[1]
+        # print mouth_id_store[2]
+        # print mouth_id_store[3]
+        # print mouth_id_store[4]
+        # print mouth_id_store[5]
+        # print mouth_id_store[date_mouth]
+        for j in range(len(mouth_id_store[date_mouth])):
+            # print mouth_id_store[date_mouth][j][12]
+            # print type(date)
+            # print int(re.findall('\d{8}', mouth_id_store[date_mouth][j][12])[0])
+            if date==int(re.findall('\d{8}',mouth_id_store[date_mouth][j][12])[0]):
+                # print mouth_id_store[date_mouth][j]
+                # print '运行'
+                for i in range(4):
+                    visit_date_data.append(float(mouth_id_store[date_mouth][j][i+5]))
+                    if date_mouth-1>=0 and mouth_id_store[date_mouth-1][j]!=[]:
+                        if re.search('\d', mouth_id_store[date_mouth-1][j][i+5]) == None:
+                            pass
+                        else:
+                            same_base_data.append(float(mouth_id_store[date_mouth-1][j][i+5]))
+                    else:
+                        print '超出数据范围无法得出日同比'
+                break
+            # else:
+            #     print '没有找到数据无法得出日同比'
+            #     break
+        prod0 = map(lambda (a,b):a-b, zip(visit_date_data,same_base_data))
+        same_grow0=map(lambda (a,b):a/b,zip(prod0,visit_date_data))
+        print prod0,same_grow0
+        x = np.arange(len(same_grow0))
+        plt.text(0.06, 0.001, u'交易金额')
+        plt.text(1.01, 0.0016, u'交易笔数')
+        plt.text(2.064, 0.002, u'交易人数')
+        plt.text(3, 0.0029, u'实收笔单价')
+        plt.ylabel(u'同比增长')  # X轴标签
+        # plt.ylabel("(translation_value\yuan)")  #
+        plt.title(u"日同比")
+        plt.plot(x, same_grow0, color='r')
+        plt.bar(x, same_grow0, alpha=.5, color='g')
+        plt.show()
+        visit_date_data=[]
+
+        #求日环比
+        if date==int(re.findall('\d{8}',day_id_store[0][12])[0]):
+            print '此为第一天无法得出日环比'
+        else:
+            for i in range(len(day_id_store)):
+                if date==int(re.findall('\d{8}',day_id_store[i][12])[0]):
+                    for j in range(4):
+                        if re.search('\d', day_id_store[i][j+5]) == None:
+                            pass
+                        else:
+
+                            visit_date_data.append(float(day_id_store[i][j+5]))
+                            circle_base_data.append(float(day_id_store[i - 1][j + 5]))
+                    break
+                # else:
+                #     print '没有找到数据无法得出日环比'
+                #     break
+        prod1 = map(lambda (a, b): a - b, zip(visit_date_data, circle_base_data))
+        same_grow1 = map(lambda (a, b): a / b, zip(prod1, visit_date_data))
+        print prod1,same_grow1
+        # data = np.random.randint(1, 11, 5)
+        x = np.arange(len(same_grow1))
+        plt.text(0.06,0.001, u'交易金额')
+        plt.text(1.01,0.0016, u'交易笔数')
+        plt.text(2.064,0.002, u'交易人数')
+        plt.text(3,0.0029, u'实收笔单价')
+        plt.ylabel(u'环比增长')  # X轴标签
+        # plt.ylabel("(translation_value\yuan)")  #
+        plt.title(u"日环比")
+        plt.plot(x, same_grow1, color='r')
+        plt.bar(x, same_grow1, alpha=.5, color='g')
+        plt.show()
+
+
+
+
+
+
+
+
+
+
+        # if data_index==0:
+        #     print '这是第一天没有对比数据'
+        # elif data_index-30>0:#可以求同比和环比
+        #     for i in range(4):
+        #         visit_date_data.append(float(unique_id_store[data_index][i + 5]))
+        #         same_base_data.append(float(unique_id_store[data_index-30][i + 5]))
+        #         same_grow.apeend(((visit_date_data - circle_base_data) / circle_base_data) * 100)#错误
+        #     for i in range(4):
+        #         visit_date_data.append(float(unique_id_store[data_index][i+5]))
+        #         circle_base_data.append(float(unique_id_store[data_index - 1][i+5]))
+        #         circle_grow.apeend(((visit_date_data - circle_base_data) / circle_base_data) * 100)
+        #
+        #
+        # else:#只能求环比
+        #     for i in range(4):
+        #         visit_date_data.append(float(unique_id_store[data_index][i+5]))
+        #         circle_base_data.append(float(unique_id_store[data_index - 1][i+5]))
+        #         circle_grow.apeend(((visit_date_data - circle_base_data) / circle_base_data) * 100)
+
+
+    def weekend_comper(self, unique_id_store, date):
+
+        week_id_store = []
+        day_id_store = unique_id_store
+        mouth_id_store = []
+        four_mouth = []
+        fif_mouth = []
+        six_mouth = []
+        seven_mouth = []
+        eight_mouth = []
+        nine_mouth = []
+        visit_date_data=[0,0,0,0]
+        visit1_date_data=[]
+        circle_base_data=[]
+        circle_grow=[]
+        same1_base_data=[]
+        same_base_data=[0,0,0,0]
+        circle2_base_data=[]
+        visit2_date_data=[]
+        visit3_date_data=[0,0,0,0]
+        circle3_base_data=[0,0,0,0]
+        mouth_week_id_store=[]
+        if date>20160920 or date<20160426:
+            print '查询日期超出数据范围'
+            exit(0)
+        f = open('F:\Users\zwc\Desktop\z6', 'w')
+        # for each in day_id_store:
+        #     f.write('%s' % (each))
+        #     f.write('%s'%'####')
+
+        h=0
+        for j in range(len(day_id_store) / 7):
+            week_id_store.append(day_id_store[h:h + 7])
+            h += 7
+
+        if h< len(day_id_store):
+            k = len(day_id_store)
+            week_id_store.append(day_id_store[h:k])
+        # for each in week_id_store:
+        #     f.write('%s' % (each))
+        #     f.write('%s'%'*****')
+        print len(week_id_store),week_id_store[14]
+        for i in range(25):
+            four_mouth.append([])
+        for i in range(len(day_id_store)):
+            if re.findall('.*\d{1,2}', day_id_store[i][12]) != []:
+                four_mouth.append(day_id_store[i])
+            elif re.findall('.*201605\d{1,2}', day_id_store[i][12]) != []:
+                fif_mouth.append(day_id_store[i])
+            elif re.findall('.*201606\d{1,2}', day_id_store[i][12]) != []:
+                six_mouth.append(day_id_store[i])
+            elif re.findall('.*201607\d{1,2}', day_id_store[i][12]) != []:
+                seven_mouth.append(day_id_store[i])
+            elif re.findall('.*201608\d{1,2}', day_id_store[i][12]) != []:
+                eight_mouth.append(day_id_store[i])
+            elif re.findall('.*201608\d{1,2}', day_id_store[i][12]) != []:
+                nine_mouth.append(day_id_store[i])
+        for j in range(10):
+            nine_mouth.append([])
+        mouth_id_store.append(four_mouth)
+        mouth_id_store.append(fif_mouth)
+        mouth_id_store.append(six_mouth)
+        mouth_id_store.append(seven_mouth)
+        mouth_id_store.append(eight_mouth)
+        mouth_id_store.append(nine_mouth)
+        # print len(week_id_store)
+        # for i in range(len(week_id_store) / 4):
+        #     mouth_week_id_store.append(week_id_store[j:j + 4])
+        #     j += 4
+        # if j < len(week_id_store):
+        #     k = len(week_id_store)
+        #     mouth_week_id_store.append(week_id_store[j:k])
+        # for each in mouth_week_id_store:
+        #     f.write('%s' % (each))
+        #     f.write('%s'%'$$$$$$')
+        # f.close()
+        #求周同比
+        for i in range(len(week_id_store)):
+            for j in range(len(week_id_store[i])):
+                # print i,j
+                if date==int(re.findall('\d{8}', week_id_store[i][j][12])[0]) and i - 4 >= 0:
+                    wvalue_index=i
+        for i in range(len(week_id_store[wvalue_index])):
+            for j in range(4):
+                if re.search('\d', week_id_store[wvalue_index][i][j+5]) == None:
+                    visit1_date_data = [0,0,0,0]
+                else:
+                    visit1_date_data.append(float(week_id_store[wvalue_index][i][j+5]))
+            visit_date_data = map(lambda (a, b): a + b, zip(visit_date_data, visit1_date_data))
+            visit1_date_data=[]
+        for i in range(len(week_id_store[wvalue_index-4])):
+            for j in range(4):
+                if re.search('\d', week_id_store[wvalue_index - 4][i][j + 5]) == None:
+                    same1_base_data = [0,0,0,0]
+                else:
+                    same1_base_data.append(float(week_id_store[wvalue_index - 4][i][j + 5]))
+            same_base_data = map(lambda (a, b): a + b, zip(same_base_data, same1_base_data))
+            same1_base_data = []
+
+        # print len(mouth_week_id_store)
+        # print mouth_week_id_store[2]
+        # print mouth_week_id_store[0][0]
+        # print mouth_week_id_store[0][0][0]
+        # for i in range(len(mouth_week_id_store)):
+        #     for j in range(len(mouth_week_id_store[i])):
+        #         for k in range(len(mouth_week_id_store[i][j])):
+        #             if date == int(re.findall('\d{8}', mouth_week_id_store[i][j][k][12])[0]) and i - 1 >= 0:
+        #                 mvalue_index = i
+        #                 wvalue_index = j
+        #             # else:
+        #             #     print '此为第一月或没有查到数据无法得到周同比'
+        #
+        # for i in range(len(mouth_week_id_store[mvalue_index][wvalue_index])):
+        #     for j in range(4):
+        #         visit1_date_data.append(float(mouth_week_id_store[mvalue_index][wvalue_index][i][j+5]))
+        #         visit_date_data = map(lambda (a, b): a + b, zip(visit_date_data, visit1_date_data))
+        #         visit1_date_data=[]
+        # for i in range(len(mouth_week_id_store[mvalue_index-1][wvalue_index])):
+        #     for j in range(4):
+        #         same1_base_data.append(float(mouth_week_id_store[mvalue_index][wvalue_index-1][i][j + 5]))
+        #         same_base_data = map(lambda (a, b): a + b, zip(same_date_data, same1_date_data))
+        #         same1_base_data = []
+        prod2= map(lambda (a, b): a - b, zip(visit_date_data, same_base_data))
+        same_grow2 = map(lambda (a, b): a / b, zip(prod2, visit_date_data))
+        print same_grow2
+        x = np.arange(len(same_grow2))
+        plt.text(0.06, 0.001, u'交易金额')
+        plt.text(1.01, 0.0016, u'交易笔数')
+        plt.text(2.064, 0.002, u'交易人数')
+        plt.text(3, 0.0029, u'实收笔单价')
+        plt.ylabel(u'同比增长')  # X轴标签
+        # plt.ylabel("(translation_value\yuan)")  #
+        plt.title(u"周同比")
+        plt.plot(x, same_grow2, color='r')
+        plt.bar(x, same_grow2, alpha=.5, color='g')
+        plt.show()
+        #求环比
+
+        for i in range(len(week_id_store)):
+            for j in range(len(week_id_store[i])):
+                if date==int(re.findall('\d{8}',week_id_store[i][j][12])[0]) and i-1>=0:
+                    wvalue_index=i
+                # else:
+                #     print '此为第一周或没有查到数据无法得到周环比'
+        print wvalue_index
+        for i in range(len(week_id_store[wvalue_index])):
+            for j in range(4):
+                if re.search('\d', week_id_store[wvalue_index][i][j+5]) == None:
+                    visit2_date_data = [0,0,0,0]
+                else:
+                    visit2_date_data.append(float(week_id_store[wvalue_index][i][j+5]))
+            visit3_date_data = map(lambda (a, b): a + b, zip(visit3_date_data, visit2_date_data))
+            visit2_date_data=[]
+        for i in range(len(week_id_store[wvalue_index-1])):
+            for j in range(4):
+                if re.search('\d', week_id_store[wvalue_index-1][i][j+5]) == None:
+                    circle2_base_data = [0,0,0,0]
+                else:
+                    circle2_base_data.append(float(week_id_store[wvalue_index-1][i][j+5]))
+            circle3_base_data = map(lambda (a, b): a + b, zip(circle3_base_data, circle2_base_data))
+            circle2_base_data=[]
+        prod3= map(lambda (a, b): a - b, zip(visit3_date_data, circle3_base_data))
+        circle_grow3= map(lambda (a, b): a / b, zip(prod3, visit3_date_data))
+        # print visit3_date_data,circle3_base_data
+        print prod3,circle_grow3
+        x = np.arange(len(circle_grow3))
+        plt.text(0.06, 0.001, u'交易金额')
+        plt.text(1.01, 0.0016, u'交易笔数')
+        plt.text(2.064, 0.002, u'交易人数')
+        plt.text(3, 0.0029, u'实收笔单价')
+        plt.ylabel(u'同比增长')  # X轴标签
+        # plt.ylabel("(translation_value\yuan)")  #
+        plt.title(u"周环比")
+        plt.plot(x, circle_grow3, color='r')
+        plt.bar(x, circle_grow3, alpha=.5, color='g')
+        plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def mouth_comper(self, unique_id_store, date):
+        #月只能求出环比值
+        if date>20160920 or date<20160426:
+            print '查询日期超出数据范围'
+            exit(0)
+        week_id_store = []
+        day_id_store = unique_id_store
+        mouth_id_store = []
+        four_mouth = []
+        fif_mouth = []
+        six_mouth = []
+        seven_mouth = []
+        eight_mouth = []
+        nine_mouth = []
+        visit_date_data = []
+        circle_base_data = []
+        circle_grow = []
+        same_base_data = []
+        visit2_date_data=[]
+        circle2_base_data=[]
+        visit3_date_data=[0,0,0,0]
+        circle3_base_data=[0,0,0,0]
+        for j in range(len(day_id_store) / 7):
+            week_id_store.append(day_id_store[j:j + 7])
+            j += 7
+        if j < len(day_id_store):
+            k = len(day_id_store)
+            week_id_store.append(day_id_store[j:k])
+        for i in range(25):
+            for i in range(len(day_id_store)):
+                if re.findall('.*201604\d{1,2}', day_id_store[i][12]) != []:
+                    four_mouth.append(day_id_store[i])
+                elif re.findall('.*201605\d{1,2}', day_id_store[i][12]) != []:
+                    fif_mouth.append(day_id_store[i])
+                elif re.findall('.*201606\d{1,2}', day_id_store[i][12]) != []:
+                    six_mouth.append(day_id_store[i])
+                elif re.findall('.*201607\d{1,2}', day_id_store[i][12]) != []:
+                    seven_mouth.append(day_id_store[i])
+                elif re.findall('.*201608\d{1,2}', day_id_store[i][12]) != []:
+                    eight_mouth.append(day_id_store[i])
+                elif re.findall('.*201609\d{1,2}', day_id_store[i][12]) != []:
+                    nine_mouth.append(day_id_store[i])
+        # for j in range(10):
+        #     nine_mouth.append([])
+        mouth_id_store.append(four_mouth)
+        mouth_id_store.append(fif_mouth)
+        mouth_id_store.append(six_mouth)
+        mouth_id_store.append(seven_mouth)
+        mouth_id_store.append(eight_mouth)
+        mouth_id_store.append(nine_mouth)
+        mouth_index=int(str(date)[5])-4
+        print mouth_index
+        print len(mouth_id_store)
+        if mouth_index-1<=0:
+            print '此为四月或五月无法得出环比值'
+        else:
+            for i in range(len(mouth_id_store[mouth_index])):
+                for j in range(4):
+                    if re.search('\d', mouth_id_store[mouth_index - 1][i][j + 5]) == None:
+                        visit2_date_data = [0, 0, 0, 0]
+                    else:
+                        visit2_date_data.append(float(mouth_id_store[mouth_index][i][j + 5]))
+                visit3_date_data = map(lambda (a, b): a + b, zip(visit3_date_data, visit2_date_data))
+                visit2_date_data = []
+
+            for i in range(len(mouth_id_store[mouth_index - 1])):
+                for j in range(4):
+                        print i
+                        if re.search('\d',mouth_id_store[mouth_index-1][i][j+5])==None:
+                            circle2_base_data=[0,0,0,0]
+                        else:
+                            # print mouth_id_store[mouth_index-1][i][j + 5]
+                            circle2_base_data.append(float(mouth_id_store[mouth_index-1][i][j + 5]))
+                # print circle2_base_data
+                circle3_base_data = map(lambda (a, b): a + b, zip(circle3_base_data, circle2_base_data))
+                # print circle3_base_data
+                circle2_base_data = []
+            k=len(visit3_date_data)
+            circle3_base_data=circle3_base_data[0:k]
+            prod3 = map(lambda (a, b): a - b, zip(visit3_date_data, circle3_base_data))
+            circle_grow3 = map(lambda (a, b): a / b, zip(prod3, visit3_date_data))
+            print visit3_date_data,circle3_base_data
+            print prod3,circle_grow3
+            x = np.arange(len(circle_grow3))
+            plt.text(0.06, 0.001, u'交易金额')
+            plt.text(1.01, 0.0016, u'交易笔数')
+            plt.text(2.064, 0.002, u'交易人数')
+            plt.text(3, 0.0029, u'实收笔单价')
+            plt.ylabel(u'环比增长')  # X轴标签
+            # plt.ylabel("(translation_value\yuan)")  #
+            plt.title(u"月环比")
+            plt.plot(x, circle_grow3, color='r')
+            plt.bar(x, circle_grow3, alpha=.5, color='g')
+            plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        #
+        # visit_date_data = []
+        # circle_base_data = []
+        # circle_grow = []
+        # for i in range(len(unique_id_store)):
+        #     if date == int(re.findall('\d{8}', unique_id_store[i][13])[0]):
+        #         data_index = i
+        # if data_index==0:
+        #     print '这是第一天没有对比数据'
+        #
+        #
+        # elif data_index-30>0 and data_index+30<=len(unique_id_store):
+        #     for i in range(4):
+        #         for j in range(30):
+        #             this_para.append(float(unique_id_store[data_index + j][i + 5]))
+        #             before_para.append(float(unique_id_store[data_index - 7 + j][i + 5]))
+        #         this_para_sum = sum(this_para)
+        #         before_para_sum = sum(before_para)
+        #
+        #         visit_date_data.append(this_para_sum)
+        #         circle_base_data.append(before_para_sum)
+        #         circle_grow.apeend(((visit_date_data - circle_base_data) / circle_base_data) * 100)
